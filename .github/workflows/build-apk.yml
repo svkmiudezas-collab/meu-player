@@ -1,0 +1,41 @@
+name: Gerar APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Criar casca nativa do projeto
+        run: |
+          flutter create --org br.meuplayer --project-name meu_player --platforms android .
+          cp extras/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+          cp -r extras/icone_res/* android/app/src/main/res/
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle.kts || true
+          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle || true
+
+      - name: Baixar dependências
+        run: flutter pub get
+
+      - name: Compilar APK
+        run: flutter build apk --release
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: meu-player-apk
+          path: build/app/outputs/flutter-apk/app-release.apk

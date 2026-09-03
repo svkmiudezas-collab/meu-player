@@ -1,0 +1,8 @@
+Adicione estas chaves dentro do <dict> principal do ios/Runner/Info.plist:
+
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Precisamos acessar sua biblioteca de músicas para tocá-las no aplicativo.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+    </array>

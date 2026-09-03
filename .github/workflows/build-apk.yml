@@ -31,6 +31,21 @@ jobs:
       - name: Baixar dependências
         run: flutter pub get
 
+      - name: Corrigir namespace ausente em plugins antigos
+        run: |
+          shopt -s nullglob
+          for PLUGIN_DIR in "$HOME"/.pub-cache/hosted/pub.dev/on_audio_query_android-*; do
+            GRADLE_FILE="$PLUGIN_DIR/android/build.gradle"
+            MANIFEST_FILE="$PLUGIN_DIR/android/src/main/AndroidManifest.xml"
+            if [ -f "$GRADLE_FILE" ] && ! grep -q "namespace" "$GRADLE_FILE"; then
+              PKG=$(grep -oP 'package="\K[^"]+' "$MANIFEST_FILE")
+              if [ -n "$PKG" ]; then
+                echo "Adicionando namespace '$PKG' em $GRADLE_FILE"
+                sed -i "/^android {/a\\    namespace '$PKG'" "$GRADLE_FILE"
+              fi
+            fi
+          done
+
       - name: Compilar APK
         run: flutter build apk --release
 

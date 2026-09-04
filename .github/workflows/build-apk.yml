@@ -31,6 +31,21 @@ jobs:
       - name: Baixar dependências
         run: flutter pub get
 
+      - name: Corrigir plugins antigos para o AGP 8 (namespace)
+        run: |
+          for f in $(find "$HOME/.pub-cache" "$FLUTTER_ROOT/.pub-cache" -path '*/android/build.gradle' 2>/dev/null); do
+            dir=$(dirname "$f")
+            m="$dir/src/main/AndroidManifest.xml"
+            [ -f "$m" ] || continue
+            pkg=$(grep -o 'package="[^"]*"' "$m" | head -1 | cut -d'"' -f2)
+            [ -n "$pkg" ] || continue
+            if ! grep -q 'namespace' "$f"; then
+              sed -i "0,/^android[[:space:]]*{/s//android {\n    namespace \"$pkg\"/" "$f"
+              echo "namespace adicionado em $f -> $pkg"
+            fi
+            sed -i 's/ package="[^"]*"//' "$m"
+          done
+
       - name: Compilar APK
         run: flutter build apk --release
 

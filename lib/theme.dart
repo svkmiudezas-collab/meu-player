@@ -69,7 +69,7 @@ ThemeData buildTheme() {
       thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
       overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
     ),
-    dialogTheme: const DialogTheme(
+    dialogTheme: const DialogThemeData(
       backgroundColor: Palette.surface,
       surfaceTintColor: Colors.transparent,
     ),

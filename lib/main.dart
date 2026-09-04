@@ -15,6 +15,9 @@ Future<void> main() async {
     androidNotificationChannelId: 'br.meuplayer.audio',
     androidNotificationChannelName: 'Reprodução de música',
     androidNotificationOngoing: true,
+    // Ícone monocromático exclusivo para a notificação. O ícone adaptativo do
+    // app não serve aqui e faria o Android descartar a notificação.
+    androidNotificationIcon: 'drawable/ic_stat_music',
     // Mantém o serviço vivo mesmo pausado: evita que MIUI/HyperOS encerre o app.
     androidStopForegroundOnPause: false,
     androidShowNotificationBadge: true,

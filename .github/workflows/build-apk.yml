@@ -31,47 +31,6 @@ jobs:
       - name: Baixar dependências
         run: flutter pub get
 
-      - name: Corrigir problemas de build em plugins antigos
-        run: |
-          python3 - <<'PYEOF'
-          import glob, os, re
-
-          pattern = os.path.expanduser("~/.pub-cache/hosted/pub.dev/on_audio_query_android-*")
-          for plugin_dir in glob.glob(pattern):
-              gradle_file = os.path.join(plugin_dir, "android", "build.gradle")
-              manifest_file = os.path.join(plugin_dir, "android", "src", "main", "AndroidManifest.xml")
-              if not os.path.isfile(gradle_file):
-                  continue
-              content = open(gradle_file).read()
-              changed = False
-
-              if "namespace" not in content:
-                  manifest = open(manifest_file).read()
-                  m = re.search(r'package="([^"]+)"', manifest)
-                  if m:
-                      pkg = m.group(1)
-                      content = content.replace("android {", "android {\n    namespace '%s'" % pkg, 1)
-                      changed = True
-                      print("Namespace '%s' adicionado em %s" % (pkg, gradle_file))
-
-              if "kotlinOptions" not in content:
-                  block = "android {\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n    kotlinOptions {\n        jvmTarget = '17'\n    }"
-                  content = content.replace("android {", block, 1)
-                  changed = True
-                  print("JVM target corrigido em %s" % gradle_file)
-
-              sdk_match = re.search(r'compileSdk(?:Version)?\s+(\d+)', content)
-              if sdk_match and int(sdk_match.group(1)) < 34:
-                  old_text = sdk_match.group(0)
-                  new_text = old_text.replace(sdk_match.group(1), "34")
-                  content = content.replace(old_text, new_text, 1)
-                  changed = True
-                  print("compileSdk atualizado de %s para 34 em %s" % (sdk_match.group(1), gradle_file))
-
-              if changed:
-                  open(gradle_file, "w").write(content)
-          PYEOF
-
       - name: Compilar APK
         run: flutter build apk --release
 

@@ -148,11 +148,11 @@ class _SeekBar extends StatelessWidget {
       stream: player.positionStream,
       builder: (_, s) {
         final pos = s.data ?? Duration.zero;
-        final max = total.inMilliseconds.toDouble().clamp(1, double.infinity);
+        final max = total.inMilliseconds.toDouble().clamp(1, double.infinity).toDouble();
         return Column(
           children: [
             Slider(
-              value: pos.inMilliseconds.toDouble().clamp(0, max),
+              value: pos.inMilliseconds.toDouble().clamp(0, max).toDouble(),
               max: max,
               onChanged: (v) => player.seek(Duration(milliseconds: v.round())),
             ),

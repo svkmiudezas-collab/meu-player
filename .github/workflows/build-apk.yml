@@ -27,6 +27,7 @@ jobs:
           cp -r extras/icone_res/* android/app/src/main/res/
           sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle.kts || true
           sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle || true
+          echo "kotlin.jvm.target.validation.mode=warning" >> android/gradle.properties
 
       - name: Baixar dependências
         run: flutter pub get
